@@ -14,7 +14,7 @@ async def last_speaker(opsdroid, config, message):
     await opsdroid.memory.put("last_speaker", message.user)
 
 
-@match_crontab('* * * * *', timezone="Europe/London")
+@match_crontab('0 * * * *', timezone="Europe/London")
 async def remind(opsdroid, config, message):
     # Get the default connector
     connector = opsdroid.default_connector
@@ -26,6 +26,8 @@ async def remind(opsdroid, config, message):
     message = Message("", None, room, connector)
 
     last_speaker = await opsdroid.memory.get("last_speaker")
+    if last_speaker == None:
+        return
 
     # Remind the player
     await message.respond(f"Hey {last_speaker}, don't forget to tell the DM you're finished.")
