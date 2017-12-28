@@ -5,6 +5,7 @@ from opsdroid.matchers import match_always, match_crontab
 def setup(opsdroid):
     logging.debug("Loaded reminder module")
 
+
 @match_always
 def last_speaker(opsdroid, config, message):
     # Keep track of the last person in the room to speak.
@@ -15,9 +16,11 @@ def last_speaker(opsdroid, config, message):
 def remind(opsdroid, config, message):
     # Get the default connector
     connector = opsdroid.default_connector
+    logging.debug(f"Selected {} as default connector")
 
     # Get the default room for that connector
     room = connector.default_room
+    logging.debug(f"Selected {} as default room")
 
     # Create an empty message to respond to
     message = Message("", None, room, connector)
