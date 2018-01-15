@@ -29,28 +29,3 @@ def setup(opsdroid):
                 cron_decorator = match_crontab(specs['crontime'],
                                                timezone="Europe/London")
                 this_reminder = cron_decorator(this_reminder)
-
-
-@match_always
-async def last_speaker(opsdroid, config, message):
-    # Keep track of the last person in the room to speak.
-    await opsdroid.memory.put("last_speaker", message.user)
-
-
-@match_crontab('0 * * * *', timezone="Europe/London")
-async def remind(opsdroid, config, message):
-    # Get the default connector
-    connector = opsdroid.default_connector
-
-    # Get the default room for that connector
-    room = connector.default_room
-
-    # Create an empty message to respond to
-    message = Message("", None, room, connector)
-
-    last_speaker = await opsdroid.memory.get("last_speaker")
-    if last_speaker == None:
-        return
-
-    # Remind the player
-    await message.respond(f"Hey {last_speaker}, don't forget to tell the DM you're finished.")
