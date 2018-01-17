@@ -5,7 +5,7 @@ from opsdroid.matchers import match_always, match_crontab
 from opsdroid.message import Message
 
 
-async def reminder(opsdroid, config, message, specs):
+async def reminder(opsdroid, config, message, text):
     # Get the default connector
     connector = opsdroid.default_connector
 
@@ -16,16 +16,19 @@ async def reminder(opsdroid, config, message, specs):
     message = Message("", None, room, connector)
 
     # Remind the player
-    await message.respond(specs['message'])
+    await message.respond(text)
 
 
 def setup(opsdroid):
     logging.debug("Loaded reminder module")
     for skill in opsdroid.config['skills']:
         if skill['name'] == 'remind':
-            for (funcname, specs) in skill['reminders'].items():
-                logging.debug(f"Creating reminder {funcname} for {specs['crontime']}.")
-                this_reminder = partial(reminder, specs=specs)
-                cron_decorator = match_crontab(specs['crontime'],
-                                               timezone="Europe/London")
+            logging.debug(skill['reminders'])
+            reminders = {}
+            for confentry in skill['reminders']:
+                reminders.update(confentry)
+            for (remindercron, remindertext) in reminders.items():
+                logging.debug(f"Creating reminder {remindercron}: '{remindertext}'.")
+                this_reminder = partial(reminder, text=remindertext)
+                cron_decorator = match_crontab(remindercron, timezone="Europe/London")
                 this_reminder = cron_decorator(this_reminder)
